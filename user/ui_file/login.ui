@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>252</width>
+    <height>339</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>Consolas</family>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Login</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget
+{border:15px;
+margin:10px;
+background-color:rgb(255, 255, 255);
+}
+QWidget#right_widget
+{border-radius:15;}
+
+</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="font">
+      <font>
+       <family>Adobe Arabic</family>
+       <pointsize>11</pointsize>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-color:rgb(0, 0, 0)
+font-size：20px</string>
+     </property>
+     <property name="text">
+      <string>连接地址</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="3">
+    <widget class="QLabel" name="label_2">
+     <property name="styleSheet">
+      <string notr="true">color: rgb(99, 99, 99);</string>
+     </property>
+     <property name="text">
+      <string>[!]未注册将会自动注册</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="3">
+    <widget class="QLabel" name="label">
+     <property name="font">
+      <font>
+       <family>Consolas</family>
+       <pointsize>22</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(0, 0, 0);</string>
+     </property>
+     <property name="text">
+      <string>Zmh server</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="3">
+    <widget class="QLineEdit" name="lineEdit">
+     <property name="styleSheet">
+      <string notr="true">            QLineEdit
+            {border:0px;
+            border-radius:0;
+            margin:10px;
+            border-bottom: 2px solid #B3B3B3;
+            font-family:'等线';
+            font-size:20px;
+            font-weight:bold;}
+            QLineEdit:hover{
+                border-bottom:3px solid #66A3FF;
+            }
+            QLineEdit:focus{
+                border-bottom:3px solid #E680BD
+            }</string>
+     </property>
+     <property name="placeholderText">
+      <string>用户名(4-16字符)</string>
+     </property>
+     <property name="clearButtonEnabled">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="3">
+    <widget class="QPushButton" name="pushButton">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="accessibleName">
+      <string/>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">                            QPushButton
+                            {text-align : center;
+                            background-color:qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #fbc2eb, stop:1 #a6c1ee);
+                            font: bold;
+                            border-color: grey;
+                            border-width: 2px;
+                            border-radius: 10px;
+                            padding: 6px;
+                            height: 28px;
+                            border-style: outset;
+            				margin-left:30px;
+            				margin-right:30px;
+                            font-family:'黑体';
+                            font : 18px;}
+
+                            QPushButton:pressed
+                            {text-align : center;
+                            background-color : light gray;
+                            background-color:qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #e1aad2, stop:1 #92adda);
+                            font: bold;
+                            color:lightblue;
+                            border-color: gray;
+                            border-width: 2px;
+                            border-radius: 10px;
+                            padding: 6px;
+                            height : 28px;
+                            border-style: outset;
+                            font-family:'黑体';
+                            font : 18px;}
+                            QPushButton:hover:!pressed
+                            {color:red;}</string>
+     </property>
+     <property name="text">
+      <string> 登录</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" colspan="2">
+    <widget class="QComboBox" name="comboBox">
+     <property name="styleSheet">
+      <string notr="true">            QComboBox
+            {border:0px;
+            border-radius:0;
+            margin:10px;
+            border-bottom: 2px solid #B3B3B3;
+            font-family:'等线';
+            font-size:25px;
+            font-weight:bold;}
+            QComboBox:hover{
+                border-bottom:3px solid #66A3FF;
+            }
+            QComboBox:focus{
+                border-bottom:3px solid #E680BD;
+            }
+</string>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

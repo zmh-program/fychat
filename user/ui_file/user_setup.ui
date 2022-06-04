@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>362</width>
+    <height>394</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>Consolas</family>
+    <pointsize>12</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>登录 - 注册</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../../../../.designer/images/user.png</normaloff>../../../../.designer/images/user.png</iconset>
+  </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="focusPolicy">
+      <enum>Qt::StrongFocus</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap>../../../../.designer/images/zmh.png</pixmap>
+     </property>
+     <property name="buddy">
+      <cstring></cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="3">
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="accessibleName">
+      <string/>
+     </property>
+     <property name="autoFillBackground">
+      <bool>true</bool>
+     </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="login">
+      <attribute name="title">
+       <string>登录</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="2" column="0" colspan="2">
+        <widget class="QLineEdit" name="lineEdit_5">
+         <property name="styleSheet">
+          <string notr="true">            QLineEdit
+            {border:0px;
+            border-radius:0;
+			font: 12pt &quot;Consolas&quot;;
+            margin:15px;
+            border-bottom: 2px solid #B3B3B3;}
+            QLineEdit:hover{
+                border-bottom:3px solid #66A3FF;
+            }
+            QLineEdit:focus{
+                border-bottom:3px solid #E680BD
+            }</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="echoMode">
+          <enum>QLineEdit::Password</enum>
+         </property>
+         <property name="placeholderText">
+          <string>密码(4-10字符)</string>
+         </property>
+         <property name="clearButtonEnabled">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QLineEdit" name="lineEdit_4">
+         <property name="styleSheet">
+          <string notr="true">            QLineEdit
+            {border:0px;
+            border-radius:0;
+			font: 12pt &quot;Consolas&quot;;
+            margin:15px;
+            border-bottom: 2px solid #B3B3B3;}
+            QLineEdit:hover{
+                border-bottom:3px solid #66A3FF;
+            }
+            QLineEdit:focus{
+                border-bottom:3px solid #E680BD
+            }</string>
+         </property>
+         <property name="placeholderText">
+          <string>用户名(2-12字符)</string>
+         </property>
+         <property name="clearButtonEnabled">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="QPushButton" name="pushButton_2">
+         <property name="text">
+          <string>登录</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../../../../.designer/images/login.png</normaloff>../../../../.designer/images/login.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QCheckBox" name="checkBox_2">
+         <property name="text">
+          <string>记住密码</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0" colspan="2">
+        <widget class="QLabel" name="label_3">
+         <property name="font">
+          <font>
+           <family>Comic Sans MS</family>
+           <pointsize>11</pointsize>
+           <weight>50</weight>
+           <italic>false</italic>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: rgb(255, 1, 39);
+font: 11pt &quot;Comic Sans MS&quot;;</string>
+         </property>
+         <property name="text">
+          <string>{info}</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="2">
+        <widget class="QCommandLinkButton" name="commandLinkButton">
+         <property name="font">
+          <font>
+           <family>Segoe UI</family>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>没有账号？ 注册一个</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="reg">
+      <attribute name="title">
+       <string>注册</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="5" column="1">
+        <widget class="QPushButton" name="pushButton">
+         <property name="text">
+          <string>注册</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../../../../.designer/images/register.png</normaloff>../../../../.designer/images/register.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QCheckBox" name="checkBox">
+         <property name="text">
+          <string>记住密码</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+         <property name="tristate">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2">
+        <widget class="QLineEdit" name="lineEdit_3">
+         <property name="contextMenuPolicy">
+          <enum>Qt::DefaultContextMenu</enum>
+         </property>
+         <property name="accessibleName">
+          <string/>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">            QLineEdit
+            {border:0px;
+            border-radius:0;
+			font: 12pt &quot;Consolas&quot;;
+            margin:15px;
+            border-bottom: 2px solid #B3B3B3;}
+            QLineEdit:hover{
+                border-bottom:3px solid #66A3FF;
+            }
+            QLineEdit:focus{
+                border-bottom:3px solid #E680BD
+            }</string>
+         </property>
+         <property name="echoMode">
+          <enum>QLineEdit::Password</enum>
+         </property>
+         <property name="dragEnabled">
+          <bool>false</bool>
+         </property>
+         <property name="placeholderText">
+          <string>再次输入密码(4-10字符)</string>
+         </property>
+         <property name="clearButtonEnabled">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QLineEdit" name="lineEdit_2">
+         <property name="font">
+          <font>
+           <family>Consolas</family>
+           <pointsize>12</pointsize>
+           <weight>50</weight>
+           <italic>false</italic>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">            QLineEdit
+            {border:0px;
+            border-radius:0;
+			font: 12pt &quot;Consolas&quot;;
+            margin:15px;
+            border-bottom: 2px solid #B3B3B3;}
+            QLineEdit:hover{
+                border-bottom:3px solid #66A3FF;
+            }
+            QLineEdit:focus{
+                border-bottom:3px solid #E680BD
+            }</string>
+         </property>
+         <property name="inputMask">
+          <string/>
+         </property>
+         <property name="echoMode">
+          <enum>QLineEdit::Password</enum>
+         </property>
+         <property name="dragEnabled">
+          <bool>false</bool>
+         </property>
+         <property name="placeholderText">
+          <string>密码(4-10字符)</string>
+         </property>
+         <property name="cursorMoveStyle">
+          <enum>Qt::LogicalMoveStyle</enum>
+         </property>
+         <property name="clearButtonEnabled">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="2">
+        <widget class="QLineEdit" name="lineEdit">
+         <property name="font">
+          <font>
+           <family>Consolas</family>
+           <pointsize>12</pointsize>
+           <weight>50</weight>
+           <italic>false</italic>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">            QLineEdit
+            {border:0px;
+            border-radius:0;
+			font: 12pt &quot;Consolas&quot;;
+            margin:15px;
+            border-bottom: 2px solid #B3B3B3;}
+            QLineEdit:hover{
+                border-bottom:3px solid #66A3FF;
+            }
+            QLineEdit:focus{
+                border-bottom:3px solid #E680BD
+            }</string>
+         </property>
+         <property name="echoMode">
+          <enum>QLineEdit::Normal</enum>
+         </property>
+         <property name="placeholderText">
+          <string>用户名(2-12字符)</string>
+         </property>
+         <property name="clearButtonEnabled">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="2">
+        <widget class="QLabel" name="label_6">
+         <property name="styleSheet">
+          <string notr="true">color: rgb(255, 1, 39);
+font: 11pt &quot;Comic Sans MS&quot;;</string>
+         </property>
+         <property name="text">
+          <string>{info}</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="label_2">
+     <property name="font">
+      <font>
+       <family>Comic Sans MS</family>
+       <pointsize>14</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Socketserver</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QComboBox" name="comboBox">
+     <property name="font">
+      <font>
+       <family>Prestige Elite Std</family>
+       <pointsize>13</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+     <item>
+      <property name="text">
+       <string>103.46.128.21:51203</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>127.0.0.1:429</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>localhost:429</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
