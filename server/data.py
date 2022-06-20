@@ -1,68 +1,101 @@
-from json import load, dump
-from os import path, mkdir
+from json import load, dump, decoder
+from os import path, mkdir, listdir
 from hashlib import md5
 from time import time
+import logging
+
+logging.basicConfig(level=logging.DEBUG,
+                    format="%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s")
+logger = logging.getLogger(__name__)
 
 
-def encode(data: str):
+def _mkdir(_folder):
+    try:
+        if not path.exists(_folder):
+            mkdir(_folder)
+            return True
+    except NotImplementedError:
+        logger.exception("")
+    return False
+
+
+def encode(_data: str):
     m = md5()
-    m.update(data.encode('utf8'))
+    m.update(_data.encode('utf8'))
     return m.hexdigest()
 
 
-file = '.\clients\data.json'
-folder = '.\clients'
-if not path.exists(folder):
-    mkdir(folder)
+def timeit(objname: str, ign=True):
+    def setup_function(func_name):
+        def _exec_function(*args, _show_detail=True, **kwargs):
+            startime = time()
+            _resp = func_name(*args, **kwargs)
+            if _show_detail:
+                logger.info("Execute the function %s%s, timeit %0.3f" % (
+                    objname.title(), "" if ign else f" (at {str(func_name)})", time() - startime))
+            return _resp
+
+        return _exec_function
+
+    return setup_function
 
 
-class data:
-    def __init__(self):
-        if path.exists(file):
-            with open(file, 'r') as f:
-                self.data = load(f)
-        else:
-            self.data = {}
+folder = r'.\clients'
+_mkdir(folder)
 
-    def __get__(self, username, default=None) -> tuple:
-        return self.data.get(username, default)
+data = set()
+if path.isdir(folder):
+    try:
+        data = set(listdir(folder))
+    except decoder.JSONDecodeError:
+        pass
 
-    def __in__(self, username) -> bool:
-        return username in self.data.keys()
 
-    def __write__(self) -> None:
-        with open(file, 'w') as f:
-            dump(self.data, f, indent=4)
+def __in__(username) -> bool:
+    return username in data
 
-    def __register__(self, username, password, time: (int, float) = time()) -> None:
-        self.data[username] = (encode(password), int(time))
-        self.__write__()
 
-    def __login__(self, username, password) -> bool:
-        return self.data[username][0] == encode(password)
+def register(username, password, register_time: (int, float) = time()) -> None:
+    global data
+    data.add(username)
+    user_path = path.join(folder, encode(username))
+    print(user_path, _mkdir(user_path))
+    _mkdir(user_path)
+    with open(path.join(user_path, "user.json"), "w") as f:
+        dump({"username": username, "password": password, "register_time": int(register_time)}, f, indent=4)
 
-    def get_time(self, username):
-        return self.data[username][1]
 
-    def handler(self, type: int, username: str, password: str):
-        username = username.strip()
-        if not username:
-            return False, "未填写用户名!", ""
-        password = password.strip()
-        if not password:
-            return False, "未填写密码!", ""
-        if not 2 <= len(username) <= 12:
-            return False, "用户名需在2~12位之间!", ""
-        if not 4 <= len(password) <= 10:
-            return False, "密码需在4~10位之间!", ""
-        if type == 0:  # login
-            if not self.__in__(username):
-                return False, "用户不存在!", ""
-            if not self.__login__(username, password):
-                return False, "用户名 / 密码错误!", ""
-            return True, "欢迎回来, " + username, username
-        elif type == 1:  # register
-            if self.__in__(username):
-                return False, "已存在用户!", ""
-            self.__register__(username, password)
-            return True, "初来乍到, " + username, username
+def login(username, password) -> bool:
+    with open(path.join(path.join(folder, encode(username)), "user.json"), "r") as f:
+        _data = load(f)
+        return _data.get("username", "") == username and _data.get("password", "") == password
+
+
+def get_time(username):
+    with open(path.join(path.join(folder, encode(username)), "user.json"), "r") as f:
+        return load(f).get("register_time")
+
+
+@timeit("User Handle")
+def handler(_type: int, username: str, password: str):
+    username = username.strip()
+    if not username:
+        return False, "未填写用户名!", ""
+    password = password.strip()
+    if not password:
+        return False, "未填写密码!", ""
+    if not 2 <= len(username) <= 12:
+        return False, "用户名需在2~12位之间!", ""
+    if not 4 <= len(password) <= 10:
+        return False, "密码需在4~10位之间!", ""
+    if _type == 0:  # login
+        if not __in__(username):
+            return False, "用户不存在!", ""
+        if not login(username, password):
+            return False, "用户名 / 密码错误!", ""
+        return True, "欢迎回来, " + username, username
+    elif _type == 1:  # register
+        if __in__(username):
+            return False, "已存在用户!", ""
+        register(username, password)
+        return True, "初来乍到, " + username, username

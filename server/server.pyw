@@ -9,10 +9,11 @@ import time
 from threading import Thread
 from PyQt5 import QtCore, QtGui, QtWidgets
 from psutil import cpu_percent
-from data import data # data.py
+import data  # data.py
 from socket_queue import SocketQueue  # socket_queue.py
+from time import time
 
-__version__ = 2.6
+__version__ = 2.7
 base = 1024
 segment = base * 2  # 防止切断
 delay = 0.005
@@ -54,7 +55,7 @@ file_thread = threading(True, "文件传输", target=loop.run_forever)
 
 
 def thread_info(thread: Thread):
-    return f"{str(thread._name).ljust(12)}{thread._ident}({thread.__class__.__name__})"
+    return f"{str(getattr(thread, '_name', 'UNKNOWN')).ljust(12)}{getattr(thread, '_ident')}({thread.__class__.__name__})"
 
 
 def ignore(function):
@@ -99,13 +100,13 @@ class Command_Handler(object):
 
     def _function(self, _list):
 
-        data = {"/info": {"-v": self.get_version(),
-                          "-id": self.get_id(),
-                          "-i": self.info(),
-                          "-h": self.help(),
-                          "-name": self.name()},
-                }
-        _dict = data
+        _data = {"/info": {"-v": self.get_version(),
+                           "-id": self.get_id(),
+                           "-i": self.info(),
+                           "-h": self.help(),
+                           "-name": self.name()},
+                 }
+        _dict = _data
         for n in range(len(_list)):
             if type(_dict) == dict:
                 _dict = _dict.get(_list[n], self.unknown(" ".join(_list)))
@@ -145,13 +146,14 @@ No command named "%s". Please search [/info -h] to help.
 %s""" % (s, self.help())
 
     def cut(self, string):
-        return string.strip().split()
+        return string.split()
 
     def handler(self, c):
         return "<font color='gray'>[command]</font><font color='brown'>%s</font>\n%s" % (
             c, str(self._function(self.cut(c))))
 
-    def iscommand(self, i):
+    @staticmethod
+    def iscommand(i):
         return i.strip().startswith("/")
 
 
@@ -161,6 +163,13 @@ class Server:
     quit_message = "%s(%s) 下线了, %s"
 
     def __init__(self, usernumUpdate=lambda _: None):
+        self.encode = None
+        self.connect = None
+        self.max_count = None
+        self.socket = None
+        self.user_handle = None
+        self.address = None
+        self.backlog = None
         self.user_num_change = usernumUpdate
 
     def Setup(self, addr, port, backlog=10, max_count=base ** 2, encode='utf8'):
@@ -173,7 +182,6 @@ class Server:
         self.max_count = max_count
         self.connect = []
         self.encode = encode
-        self.user_record = data()
         return self.run()
 
     def clear_socket(self, clear_ms=500):
@@ -292,7 +300,7 @@ class Client(SocketQueue):
     @ignore
     def forever_receive(self):
         while self.isOpen():
-            result, reason, uname = self.server.user_record.handler(**self.json_data())
+            result, reason, uname = data.handler(**self.json_data())
             self.send(json.dumps({"result": result, "reason": reason}))
             if result:
                 self.username = uname
@@ -332,10 +340,6 @@ class Interface(QtWidgets.QMainWindow):
     def __init__(self):
         super(Interface, self).__init__()
         self.setWindowIcon(QtGui.QIcon("images/server.png"))
-        self.setupUi()
-        self.show()
-
-    def setupUi(self):
         self.setObjectName("MainWindow")
         self.resize(1088, 685)
         font = QtGui.QFont()
@@ -458,6 +462,8 @@ class Interface(QtWidgets.QMainWindow):
         Qlog.connect(self.Database_signal.emit)
         self.New_file_signal.connect(self.listView_2.new_file)
         self.Update_file_signal.connect(self.listView_2.update_file)
+
+        self.show()
 
     def progressUpdate(self, v):
         self.progressBar.setValue(int(v))
