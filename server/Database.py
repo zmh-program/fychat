@@ -25,9 +25,9 @@ def encode(_data: str):
     return m.hexdigest()
 
 
-def timeit(objname: str, ign=True):
+def timeit(objname: str, ign=True, _show_detail=True):
     def setup_function(func_name):
-        def _exec_function(*args, _show_detail=True, **kwargs):
+        def _exec_function(*args, **kwargs):
             startime = time()
             _resp = func_name(*args, **kwargs)
             if _show_detail:
@@ -52,7 +52,7 @@ if path.isdir(folder):
 
 
 def __in__(username) -> bool:
-    return username in data
+    return encode(username) in data
 
 
 def register(username, password, register_time: (int, float) = time()) -> None:
@@ -76,26 +76,30 @@ def get_time(username):
         return load(f).get("register_time")
 
 
-@timeit("User Handle")
+# @timeit("User Handle", _show_detail=True)
 def handler(_type: int, username: str, password: str):
-    username = username.strip()
-    if not username:
-        return False, "未填写用户名!", ""
-    password = password.strip()
-    if not password:
-        return False, "未填写密码!", ""
-    if not 2 <= len(username) <= 12:
-        return False, "用户名需在2~12位之间!", ""
-    if not 4 <= len(password) <= 10:
-        return False, "密码需在4~10位之间!", ""
-    if _type == 0:  # login
-        if not __in__(username):
-            return False, "用户不存在!", ""
-        if not login(username, password):
-            return False, "用户名 / 密码错误!", ""
-        return True, "欢迎回来, " + username, username
-    elif _type == 1:  # register
-        if __in__(username):
-            return False, "已存在用户!", ""
-        register(username, password)
-        return True, "初来乍到, " + username, username
+    try:
+        username = username.strip()
+        if not username:
+            return False, "未填写用户名!", ""
+        password = password.strip()
+        if not password:
+            return False, "未填写密码!", ""
+        if not 2 <= len(username) <= 12:
+            return False, "用户名需在2~12位之间!", ""
+        if not 4 <= len(password) <= 10:
+            return False, "密码需在4~10位之间!", ""
+        if _type == 0:  # login
+            if not __in__(username):
+                return False, "用户不存在!", ""
+            if not login(username, password):
+                return False, "用户名 / 密码错误!", ""
+            return True, "欢迎回来, " + username, username
+        elif _type == 1:  # register
+            if __in__(username):
+                return False, "已存在用户!", ""
+            register(username, password)
+            return True, "初来乍到, " + username, username
+    except Exception as e:
+        logger.exception("")
+        return False, str(e.__class__), ""

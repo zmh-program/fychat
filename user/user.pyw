@@ -15,10 +15,9 @@ from datetime import datetime
 from threading import Thread
 from time import sleep
 from traceback import format_exc
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets, QtWebEngineWidgets
 from PyQt5.QtCore import QPropertyAnimation
 
-from ProgressBar import Animation
 from socket_queue import SocketClient
 
 logging.basicConfig(level=logging.DEBUG,
@@ -88,19 +87,11 @@ def to_logging(command):
     return logs
 
 
-@to_logging
-def address_split(address):
-    def func(_ip="", _port=0) -> (str, int):
-        return _ip, int(_port)
-
-    ip, port = func(*address.strip().split(':')[:2])
-    return ip, port
-
-
 class Socket(SocketClient):
     def __init__(self, Function=lambda i: None, code='utf-8'):
         super(Socket, self).__init__(codec=code)
         self.handler = message_handle(self.send)
+        self.__old_addr = ()
 
     def parse_argument(self, arg: str) -> str:
         return self.handler.handle(arg.strip())
@@ -121,14 +112,16 @@ class Socket(SocketClient):
                 return
 
     def Check_info(self, *args, **kwargs):
-        threading(True, target = lambda: self.__Check_info(*args, **kwargs))
+        threading(True, target=lambda: self.__Check_info(*args, **kwargs))
 
     def __Check_info(self, info, emit, return_func, err_func):
-        if not self.is_connect():
+        if not self.is_connect() and self.__old_addr != self.addr:
             res, trace = self.connect()
             emit(bool(res))
             if not res:
                 return err_func(trace)
+        else:
+            emit(True)
         self.handler.send_text(json.dumps(info))
         emit(True)
         data = self.receive_text()
@@ -231,6 +224,10 @@ class User_Setup(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.start_anim = Animation(self, ms=2000)
+        palette = QtGui.QPalette()
+        palette.setBrush(self.backgroundRole(),
+                         QtGui.QBrush(QtGui.QPixmap('images/interface_background.jpg')))  # 设置背景图片
+        self.setPalette(palette)
 
         self.setObjectName("Dialog")
         self.resize(362, 394)
@@ -253,7 +250,6 @@ class User_Setup(QtWidgets.QDialog):
         self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
         self.tabWidget = QtWidgets.QTabWidget(self)
         self.tabWidget.setAccessibleName("")
-        self.tabWidget.setAutoFillBackground(True)
         self.tabWidget.setObjectName("tabWidget")
         self.log = QtWidgets.QWidget()
         self.log.setObjectName("login")
@@ -421,6 +417,7 @@ class User_Setup(QtWidgets.QDialog):
         font.setFamily("Comic Sans MS")
         font.setPointSize(14)
         self.label_2.setFont(font)
+        self.label_2.setStyleSheet("color: white;")
         self.label_2.setObjectName("label_2")
         self.gridLayout.addWidget(self.label_2, 0, 1, 1, 1)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -461,7 +458,6 @@ class User_Setup(QtWidgets.QDialog):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.reg), _translate("Dialog", "注册"))
         self.label_2.setText(_translate("Dialog", "Socketserver"))
         self.comboBox.addItems(ip_list)
-
         self.log_progress_signal.connect(self.label_3.setText)
         self.reg_progress_signal.connect(self.label_6.setText)
         self.handle_signal.connect(self.handle)
@@ -479,6 +475,7 @@ class User_Setup(QtWidgets.QDialog):
 
         self.pushButton.clicked.connect(self.register)
         self.pushButton_2.clicked.connect(self.login)
+
         self.show()
 
     def Enable(self, boolean):
@@ -503,6 +500,7 @@ class User_Setup(QtWidgets.QDialog):
         self.Enable(True)
 
     def handle(self, dictionary: (dict, str)):
+        self.loading_dialog.close()
         if isinstance(dictionary, dict):
             result = dictionary.get("result", False)
             reason = dictionary.get("reason", False)
@@ -550,6 +548,7 @@ class User_Setup(QtWidgets.QDialog):
         s.Check_info({"type": 0, "username": username, "password": password}, self.loading(),
                      self.handle_signal.emit, self.err_signal.emit)  # self.log_progress_signal
         self.exec_loading_dialog()
+        self.setEnabled(True)
 
         global LOGIN_INFO
         LOGIN_INFO["username"] = username
@@ -611,6 +610,7 @@ class MainTalk(QtWidgets.QMainWindow):
         super(MainTalk, self).__init__()
         self.ConnectionError_signal.connect(self.ConnectionError)
         self.MessageUpdate_signal.connect(self.Show_Message)
+
         self.is_setup = False
 
     def SetupUi(self):
@@ -673,11 +673,9 @@ class MainTalk(QtWidgets.QMainWindow):
         self.gridLayout.addWidget(self.textEdit_2, 0, 3, 2, 4)
         self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_2.setObjectName("pushButton_2")
-        #
         self.sendButton = QtWidgets.QPushButton(QtGui.QIcon("images/upload.png"), "上传文件", self.centralwidget)
         self.sendButton.setObjectName("send - pushButton")
         self.gridLayout.addWidget(self.sendButton, 8, 5)
-        #
         self.gridLayout.addWidget(self.pushButton_2, 8, 1, 1, 1)
         self.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(self)
@@ -843,7 +841,8 @@ class SEND:
                 await asyncio.sleep(delay)
         self.finish = True
 
-    def cut(self, byte: bytes, seg=segment) -> list:
+    @staticmethod
+    def cut(byte: bytes, seg=segment) -> list:
         return [byte[x:x + seg] for x in range(0, len(byte), seg)]
 
     def format(self, process, data) -> str:
@@ -1106,6 +1105,8 @@ class FileDialog(QtWidgets.QDialog):
     new_file = QtCore.pyqtSignal(list)
 
     def __init__(self, save_path, parent=None):
+        self.path = None
+        self.fpath = None
         self.current = ""
         super(FileDialog, self).__init__(parent)
         self.icon = QtGui.QIcon("images/file.png")
@@ -1197,9 +1198,9 @@ class FileDialog(QtWidgets.QDialog):
         self.activateWindow()  # 窗口置顶
 
         index = len(self.filedict)
-        name, total, size, (type, path) = args
+        name, total, size, (_type, path) = args
 
-        png = self.LOAD_dict.get(type, self.UPLOAD)
+        png = self.LOAD_dict.get(_type, self.UPLOAD)
         layout = ListWidgetLayout(name, total, size)
         progress = layout.get_progress()
         self.filedict[index] = (layout, size)
