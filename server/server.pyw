@@ -9,11 +9,10 @@ import time
 from threading import Thread
 from PyQt5 import QtCore, QtGui, QtWidgets
 from psutil import cpu_percent
-import data  # data.py
+import Database  # Database.py
 from socket_queue import SocketQueue  # socket_queue.py
-from time import time
 
-__version__ = 2.7
+__version__ = 2.8
 base = 1024
 segment = base * 2  # 防止切断
 delay = 0.005
@@ -59,13 +58,13 @@ def thread_info(thread: Thread):
 
 
 def ignore(function):
-    def i(*args, **kwargs):
+    def ignore_exec_(*args, **kwargs):
         try:
             function(*args, **kwargs)
         except:
             return
 
-    return i
+    return ignore_exec_
 
 
 logger = logging.getLogger(__name__)
@@ -145,7 +144,8 @@ For example, <font color=red>/info -id</font>"""
 No command named "%s". Please search [/info -h] to help.
 %s""" % (s, self.help())
 
-    def cut(self, string):
+    @staticmethod
+    def cut(string):
         return string.split()
 
     def handler(self, c):
@@ -263,12 +263,12 @@ class Server:
 
 
 class Client(SocketQueue):
-    def __init__(self, socket, addr, server: Server):
-        super(Client, self).__init__(socket, server.max_count, server.encode)
+    def __init__(self, _socket, addr, _server: Server):
+        super(Client, self).__init__(_socket, _server.max_count, _server.encode)
         self.addr = addr
-        if not isinstance(server, Server):
+        if not isinstance(_server, Server):
             raise ValueError
-        self.server = server
+        self.server = _server
         self.username = str()
         self.com = Command_Handler(self)
         self.thread = threading(True, name=f"客户端{self.addr}", target=self.forever_receive)
@@ -284,10 +284,11 @@ class Client(SocketQueue):
         """返回是否在线并已可接受消息"""
         return self.isLogin() and self.isOpen()
 
-    def json_data(self):
+    def login_data(self):
         while self.isOpen():
             try:
-                return json.loads(self.recv())
+                response = json.loads(self.recv())
+                return response["type"], response["username"], response["password"]
             except TypeError:
                 self.quit()
 
@@ -300,10 +301,10 @@ class Client(SocketQueue):
     @ignore
     def forever_receive(self):
         while self.isOpen():
-            result, reason, uname = data.handler(**self.json_data())
+            result, reason, username = Database.handler(*self.login_data())
             self.send(json.dumps({"result": result, "reason": reason}))
             if result:
-                self.username = uname
+                self.username = username
                 break
 
         self._login = True
@@ -319,17 +320,6 @@ class Client(SocketQueue):
                 self.server.UserMessage(self.addr, self.username, string)
 
 
-def get_host_ip() -> str:
-    """get current IP address"""
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        s.connect(('8.8.8.8', 80))
-        ip = s.getsockname()[0]
-    finally:
-        s.close()
-    return ip
-
-
 class Interface(QtWidgets.QMainWindow):
     Database_signal = QtCore.pyqtSignal(str)
     Usernum_signal = QtCore.pyqtSignal(int)
@@ -339,6 +329,10 @@ class Interface(QtWidgets.QMainWindow):
 
     def __init__(self):
         super(Interface, self).__init__()
+        self.addr = None
+        self.backlog = None
+        self.port = None
+        self.max_recv = None
         self.setWindowIcon(QtGui.QIcon("images/server.png"))
         self.setObjectName("MainWindow")
         self.resize(1088, 685)
@@ -484,10 +478,10 @@ class Interface(QtWidgets.QMainWindow):
             self.groupBox_2.setEnabled(True)
             self.cpu.start()
 
-    def databaseUpdate(self, data: str):
-        if data:
+    def databaseUpdate(self, _data: str):
+        if _data:
             time.sleep(0.01)  # Qpainter 过快导致死机
-            self.textEdit_2.append(data.strip())
+            self.textEdit_2.append(_data.strip())
         self.textEdit_2.moveCursor(QtGui.QTextCursor.End)
 
     def usernumUpdate(self, i):
@@ -636,9 +630,9 @@ def save_bytes(file, byte: bytes):
         f.write(byte)
 
 
-def get_eval(str, defined=None):
+def get_eval(string, defined=None):
     try:
-        res = eval(str)
+        res = eval(string)
         if isinstance(res, type(defined)):
             return res
         raise TypeError
@@ -666,7 +660,8 @@ class SEND:
                 await asyncio.sleep(delay)
         self.finish = True
 
-    def cut(self, byte: bytes, seg=segment) -> list:
+    @staticmethod
+    def cut(byte: bytes, seg=segment) -> list:
         return [byte[x:x + seg] for x in range(0, len(byte), seg)]
 
     def format(self, process, data) -> str:
@@ -737,9 +732,9 @@ class recv_files:
         self.recvs.append(RECV(index, name, total, size))
         logger.info(f"New file - {name} - {convert(size, fine=True)}.")
 
-    def apply(self, index, progress, data):
+    def apply(self, index, progress, _data):
         if len(self.recvs) - 1 >= index:
-            if self.recvs[index].update(progress, data):
+            if self.recvs[index].update(progress, _data):
                 if self.save(index):
                     return index, self.recvs[index].name
                 else:
@@ -753,42 +748,42 @@ class recv_files:
 class message_handle:
     codec = "utf8"
 
-    def __init__(self, server: Server):
+    def __init__(self, _server: Server):
         if not os.path.isdir(save_path):
             os.makedirs(save_path)
         self.Sender = send_files(self.codec, )
         self.Receiver = recv_files(self.codec, save_path)
         self.files_record = {}
-        self.server = server
+        self.server = _server
 
     @to_logging
-    def handle(self, data, client: Client):
-        _res = get_eval(data, tuple())
+    def handle(self, _data, client: Client):
+        _res = get_eval(_data, tuple())
         if len(_res) == 2:
-            type, arguments = _res
-            if type == new_file and client.isLogin():
+            _type, arguments = _res
+            if _type == new_file and client.isLogin():
                 index, name, total, size = arguments
-                if not client.username in self.files_record:
+                if client.username not in self.files_record:
                     self.files_record[client.username] = [len(self.Receiver.recvs), ]
                 else:
                     self.files_record[client.username].append(len(self.Receiver.recvs))
 
                 self.Receiver.new_files(len(self.Receiver.recvs), name, total, size)
-            elif type == update_file and client.isLogin():
-                index, progress, data = arguments
+            elif _type == update_file and client.isLogin():
+                index, progress, _data = arguments
                 if client.username in self.files_record:
                     if not len(self.files_record[client.username]) >= index + 1:
                         index = len(self.files_record[client.username]) - 1
-                    _res = self.Receiver.apply(self.files_record[client.username][index], progress, data)
+                    _res = self.Receiver.apply(self.files_record[client.username][index], progress, _data)
                     if _res:
                         INDEX, NAME = _res
                         self.server.UserMessage(client.addr, client.username, f'<a href="{INDEX}">{NAME}</a>')
-            elif type == request_file and client.isLogin():
+            elif _type == request_file and client.isLogin():
                 path = self.Receiver.recvs[arguments].savepath()
                 logger.info(f"Client {client.username} requested file {path} ({self.Receiver.recvs[arguments]})")
                 if path:
                     self.Sender.localfile(path, client.send)  # 如若无, 报错False
-            elif type == normal_text:
+            elif _type == normal_text:
                 return arguments
 
     def send(self, sendpath, conn):
@@ -817,7 +812,6 @@ def convert(byte, fine=False):
     if not isinstance(byte, (int, float)):
         byte = len(byte)
     DEI = f"{byte} bytes"
-    base = 1024
     units = ["b",
              "Kb",
              "Mb",
