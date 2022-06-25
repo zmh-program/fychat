@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+</head>
+<style>
+    *{
+        padding: 0;
+        margin: 0;
+        font-family: Consolas,Microsoft YaHei UI,serif;
+        font-size: 22px;
+    }
+    @keyframes
+    fadeIn{
+        0% {opacity:0}
+        100% {opacity:1}
+    }
+    .clearfix::after{
+        content: "";
+        display: block;
+        clear: both;
+        width: 0;
+        height: 0;
+        line-height: 0;
+        visibility: hidden;
+    }
+
+    .chat_middle{
+        width: 100%;
+        height: 400px;
+        position: relative;
+        box-sizing: border-box;
+        overflow: auto;
+        border-width: 0;
+    }
+
+    .chat_left{
+        width: 100%;
+        height: auto;
+        min-height: 100px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        animation-name: fadeIn;
+        animation-duration: 1.5s;
+        zoom:1;
+        display: inline-block;
+    }
+    img.chat_left_img{
+        width: 50px;
+        height: 50px;
+        float: left;
+        margin-top: 10px;
+        margin-left: 10px;
+        margin-right: 10px;
+        border-radius: 25px;
+    }
+    .chat_left_item{
+        width: auto;
+        max-width: calc(100% - 70px - 15px);
+        height: auto;
+        float: left;
+        margin-top: 10px;
+    }
+    .chat_left_item .chat_left_chat{
+        float: left;
+    }
+    .chat_left_item .chat_left_content{
+        padding: 15px; /* changed */
+        margin-top: 10px;
+        background-color: #f4f5f7;
+        color: black;
+        display: inline-block;
+        overflow: auto;
+        border-radius: 0 10px 10px 10px;
+        word-wrap:break-word;
+		word-break:break-all;
+        position: relative;
+        box-shadow: 0 5px 15px rgba(20, 20, 20, 0.8);
+        align-items: center;
+    }
+
+    .chat_right{
+        width: 100%;
+        height: auto;
+        min-height: 100px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        animation-name: fadeIn;
+        animation-duration: 1.5s;
+        zoom:1;
+        display: inline-block;
+    }
+    img.chat_right_img{
+        width: 50px;
+        height: 50px;
+        float: right;
+        margin-top: 10px;
+        margin-left: 10px;
+        margin-right: 10px;
+        border-radius: 25px;
+    }
+    .chat_right_item{
+        width: auto;
+        max-width: calc(100% - 70px - 15px);
+        height: auto;
+        float: right;
+        margin-top: 10px;
+    }
+    .chat_time{
+        width: 100%;
+        text-align: center;
+        color: gray;
+    }
+    .chat_right_name{
+        color: darkgray;
+        text-align: right;
+    }
+    .chat_left_name{
+        color: darkgray;
+        text-align: left;
+    }
+    .chat_right_content{
+        float: right;
+        padding: 15px; /* changed */
+        margin-top: 10px;
+        border-radius: 10px 0 10px 10px;
+        background: linear-gradient(rgba(0, 255, 12, 255) 0%, rgba(16, 211, 22, 255) 100%);
+        color: black;
+        word-wrap:break-word;
+		word-break:break-all;
+        position: relative;
+        box-shadow: 0 5px 15px rgba(20, 20, 20, 0.8);
+        display: flex;
+        align-items: center;
+    }
+
+    .split{
+        width: 100%;
+        height: 1px;
+        visibility: hidden;
+    }
+
+	.file{
+		width:100%;
+		height:auto;
+        min-height: 50px;
+		padding:10px; 
+		background-color: #f4f5f7;
+		border: 1px;
+        display: inline-block;
+    }
+	.fileinfo{ 
+		float:left;
+	}
+	.fileicon{ 
+		float:right; 
+		width:50px;
+        height: 50px;
+	}
+	.filename{
+		word-wrap:break-word;
+		word-break:break-all;
+		overflow: hidden;
+        color: black;
+        display: inline-block;
+	}
+	.filesize{
+		width:100px;
+        height: auto;
+		font-size:12px;
+		color: rgb(153, 153, 153);
+        text-align: end;
+	}
+
+</style>
+<body>
+    <div class="chat_middle" id="chat_middle_item"></div>
+    <script>
+        // 成功发送
+        const send_message = document.getElementById("chat_middle_item");
+        let _link = -1;
+        function server_message(content){
+            const ans = '<img class="chat_left_img clearfix" src="images/server.png">' +
+                '<div class="chat_left_item">' +
+                '<div class="chat_left_name clearfix">Server</div>' +
+                '<span class="chat_left_content clearfix">' + content + '</span>'
+                + '</div>';
+            const oLi = document.createElement("div");
+
+            oLi.setAttribute("class","chat_left");
+            oLi.innerHTML=ans;
+            const _split = document.createElement("div");
+            _split.setAttribute("class", "split");
+
+            send_message.append(oLi);
+            send_message.append(_split);
+            send_message.scrollTop = send_message.scrollHeight;
+        }
+
+        function user_message(name, content, is_self){
+            let ans;
+            if (is_self) {
+                const ans = '<img class="chat_right_img clearfix" src="images/chat_user.png">' +
+                    '<div class="chat_right_item">' +
+                    '<div class="chat_right_name clearfix">' + name + '</div>' +
+                    '<span class="chat_right_content clearfix">' + content + '</span>'
+                    + '</div>';
+            } else {
+                const ans = '<img class="chat_left_img clearfix" src="images/chat_user.png">' +
+                    '<div class="chat_left_item">' +
+                    '<div class="chat_left_name clearfix">' + name + '</div>' +
+                    '<span class="chat_left_content clearfix">' + content + '</span>' +
+                    '<div class="split"></div>'
+                    + '</div>';
+            }
+
+            const oLi = document.createElement("div");
+
+            oLi.setAttribute("class","chat_right");
+            oLi.innerHTML=ans;
+            send_message.append(oLi);
+            send_message.scrollTop = send_message.scrollHeight;
+        }
+
+        function file(filename, _size, ico_path, link, username, is_self) {
+            const data = "<div class='file' onclick='set_anchor(" + link + ");'>" +
+               "<div class='fileinfo'>" +
+               "<span class='filename'>" + filename + "</span>" +
+               "<br>" +
+               "<span class='filesize'>" + _size + "</span> " +
+               "</div>" +
+               "<img class='fileicon' src='" + ico_path + "'>" +
+               "</div>"
+            user_message(username, data, is_self)
+        }
+
+        function time(time_str){
+            const time = document.createElement("div")
+            time.innerHTML = "<div class='chat_time'>"+time_str+"</div>"
+            send_message.append(time)
+        }
+
+        function height_changed(height) {
+            send_message.style.height = height + "px";
+        }
+
+        function set_anchor( index ) {
+            _link = index
+        }
+        function reset_anchor() {
+            set_anchor(-1);
+        }
+
+        function get_anchor() {
+            return _link;
+        }
+    </script>
+</body>
+</html>
