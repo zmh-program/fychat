@@ -203,13 +203,13 @@
         function user_message(name, content, is_self){
             let ans;
             if (is_self) {
-                const ans = '<img class="chat_right_img clearfix" src="images/chat_user.png">' +
+                ans = '<img class="chat_right_img clearfix" src="images/chat_user.png">' +
                     '<div class="chat_right_item">' +
                     '<div class="chat_right_name clearfix">' + name + '</div>' +
                     '<span class="chat_right_content clearfix">' + content + '</span>'
                     + '</div>';
             } else {
-                const ans = '<img class="chat_left_img clearfix" src="images/chat_user.png">' +
+                ans = '<img class="chat_left_img clearfix" src="images/chat_user.png">' +
                     '<div class="chat_left_item">' +
                     '<div class="chat_left_name clearfix">' + name + '</div>' +
                     '<span class="chat_left_content clearfix">' + content + '</span>' +
